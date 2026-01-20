@@ -1,0 +1,10 @@
+name = "pulse-sync-status"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+kv_namespaces = [
+  { binding = "STATUS_KV", id = "831a577f18964626844d71337e94b028" }
+]
+
+[triggers]
+crons = ["0 * * * *"]

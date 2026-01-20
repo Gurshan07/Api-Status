@@ -1,0 +1,68 @@
+# =========================
+# Logs
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Dependencies
+# =========================
+node_modules/
+
+# =========================
+# Build outputs
+# =========================
+dist/
+dist-ssr/
+build/
+.out/
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Cloudflare / Wrangler
+# =========================
+.wrangler/
+wrangler.local.toml
+.dev.vars
+
+# =========================
+# Local / cache files
+# =========================
+*.local
+.cache/
+.parcel-cache/
+.turbo/
+.vite/
+
+# =========================
+# Editor directories
+# =========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Visual Studio / misc
+# =========================
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
