@@ -26,7 +26,7 @@ export default {
 
     const url = new URL(request.url);
 
-    /* ---------- READ ENDPOINTS ---------- */
+    // ---------- READ ENDPOINTS ----------
     if (url.pathname === "/status") {
       return cors(json(await getAllLatest(env)));
     }
@@ -56,30 +56,51 @@ async function checkAndStore(env, id) {
   const api = APIS[id];
   const start = Date.now();
 
-  let status;
+  let status = "DOWN";
   let responseTime = 0;
 
   try {
-    const res = await fetch(api.url);
+    const res = await fetch(api.url, {
+      headers: {
+        "Accept": "application/json",
+        "User-Agent": "Pulse-Sync-Monitor"
+      }
+    });
+
     responseTime = Date.now() - start;
 
-    const statusCode = res.status;
+    if (res.ok) {
+      let semanticOk = true;
 
-    // network OK
-    if (statusCode >= 200 && statusCode < 400) {
-      if (responseTime > SLOW_THRESHOLD) status = "SLOW";
-      else status = "OPERATIONAL";
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        try {
+          const body = await res.clone().json();
+          if (body.status && body.status !== "ok") {
+            semanticOk = false;
+          }
+        } catch {
+          semanticOk = false;
+        }
+      }
+
+      if (!semanticOk) {
+        status = "DOWN";
+      } else if (responseTime > SLOW_THRESHOLD) {
+        status = "SLOW";
+      } else {
+        status = "OPERATIONAL";
+      }
     } else {
       status = "DOWN";
     }
-
   } catch {
     status = "DOWN";
   }
 
-  // 🔒 SNAP TO START OF CURRENT HOUR
+  // 🔒 SNAP TO START OF CURRENT UTC HOUR
   const now = new Date();
-  now.setMinutes(0, 0, 0);
+  now.setUTCMinutes(0, 0, 0);
 
   const entry = {
     timestamp: now.getTime(),
@@ -96,6 +117,7 @@ async function save(env, id, entry) {
   const historyKey = `history:${id}`;
   const latestKey = `latest:${id}`;
 
+  // Save latest snapshot
   await env.STATUS_KV.put(latestKey, JSON.stringify(entry));
 
   const raw = await env.STATUS_KV.get(historyKey);
@@ -104,12 +126,16 @@ async function save(env, id, entry) {
   // 🔐 ENSURE ONE ENTRY PER HOUR
   const hourKey = new Date(entry.timestamp).toISOString().slice(0, 13); // YYYY-MM-DDTHH
 
-  const exists = history.some(h =>
-    new Date(h.timestamp).toISOString().slice(0, 13) === hourKey
+  const exists = history.some(
+    h => new Date(h.timestamp).toISOString().slice(0, 13) === hourKey
   );
 
   if (!exists) {
     history.push(entry);
+
+    // ✅ ENSURE SORTED ORDER (DEFENSIVE)
+    history.sort((a, b) => a.timestamp - b.timestamp);
+
     await env.STATUS_KV.put(historyKey, JSON.stringify(history));
   }
 }
@@ -153,7 +179,9 @@ async function getHistory(env, id) {
 /* ================= UTIL ================= */
 
 function json(data) {
-  return new Response(JSON.stringify(data));
+  return new Response(JSON.stringify(data), {
+    headers: { "Content-Type": "application/json" }
+  });
 }
 
 function cors(res) {
