@@ -448,7 +448,7 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-3">
              <a 
-               href="https://github.com/Gurshan07" 
+               href="https://github.com/Gurshan07/Api-Status" 
                target="_blank" 
                rel="noopener noreferrer" 
                className="flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]"
