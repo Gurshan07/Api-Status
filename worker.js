@@ -8,6 +8,10 @@ const APIS = {
   chatpulse: {
     name: "ChatPulse",
     url: "https://cloudflare-worker-monitor-proxy.vercel.app/api/proxy?target=chatpulse"
+  },
+  "hoyo-lab-api": {
+    name: "Hoyo Lab API",
+    url: "https://ho-yo-lab-api-interface.vercel.app/"
   }
 };
 

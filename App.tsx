@@ -18,7 +18,9 @@ const WORKER_BASE = 'https://pulse-sync-status.jawandha-moecounter.workers.dev';
 
 const API_LIST: ApiConfig[] = [
   { id: 'moecounter', name: 'MoeCounter API', url: '' },
-  { id: 'chatpulse', name: 'ChatPulse', url: '' }
+  { id: 'chatpulse', name: 'ChatPulse', url: '' },
+  { id: 'hoyo-lab-api', name: 'Hoyo Lab API', url: '' }
+
 ];
 
 interface DayRecord {
